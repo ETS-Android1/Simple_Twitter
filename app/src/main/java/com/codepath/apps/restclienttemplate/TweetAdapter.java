@@ -92,7 +92,25 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder>{
             Glide.with(context).load(tweet.user.profileImageUrl).into(ivProfileImage);
             tvDate.setText(tweet.time);
 
-            container.setOnClickListener(new View.OnClickListener()
+            tvBody.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, DetailedActivity.class);
+                    i.putExtra("tweet", Parcels.wrap(tweet));
+                    context.startActivity(i);
+                }
+            });
+            tvScreenName.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(context, DetailedActivity.class);
+                    i.putExtra("tweet", Parcels.wrap(tweet));
+                    context.startActivity(i);
+                }
+            });
+            ivProfileImage.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v) {

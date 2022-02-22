@@ -42,18 +42,18 @@
         android:id="@+id/tvCreatedAt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivImage"
+        app:layout_constraintStart_toEndOf="@+id/ivProfileImage"
+        app:layout_constraintTop_toBottomOf="@+id/tvScreenName"
         tools:text="date here" />
 
     <ImageView
-        android:id="@+id/ivImage"
+        android:id="@+id/ivImages"
         android:layout_width="205dp"
         android:layout_height="196dp"
-        android:layout_marginStart="92dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvBody"
         tools:srcCompat="@tools:sample/avatars" />
@@ -63,7 +63,7 @@
         android:layout_width="331dp"
         android:layout_height="202dp"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvBody" />
+        app:layout_constraintTop_toBottomOf="@+id/ivImages" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,7 @@ public class DetailedActivity extends AppCompatActivity {
     TextView tvCreatedAt;
     TextView tvBody;
     ImageView ivProfileImage;
+    ImageView ivImages;
     Tweet tweet;
 
     @Override
@@ -30,6 +31,7 @@ public class DetailedActivity extends AppCompatActivity {
         tvCreatedAt = findViewById(R.id.tvCreatedAt);
         tvBody = findViewById(R.id.tvBody);
         ivProfileImage = findViewById(R.id.ivProfileImage);
+        ivImages = findViewById(R.id.ivImages);
 
         tweet = Parcels.unwrap(getIntent().getParcelableExtra("tweet"));
 
@@ -37,6 +39,7 @@ public class DetailedActivity extends AppCompatActivity {
         tvCreatedAt.setText(tweet.createdAt);
         tvBody.setText(tweet.body);
         Glide.with(this).load(tweet.user.profileImageUrl).into(ivProfileImage);
+        Glide.with(this).load(tweet.media).into(ivImages);
     }
 
 

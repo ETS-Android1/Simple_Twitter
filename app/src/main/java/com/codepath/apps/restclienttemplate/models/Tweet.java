@@ -1,5 +1,7 @@
 package com.codepath.apps.restclienttemplate.models;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +18,7 @@ public class Tweet {
     public long id;
     public String time;
     public String media;
+    public int mediaCount;
 
     public Tweet(){
     }
@@ -28,8 +31,16 @@ public class Tweet {
         tweet.id = jsonObject.getLong("id");
         JSONObject entity = jsonObject.getJSONObject("entities");
         JSONArray urls = entity.getJSONArray("urls");
-        tweet.time = tweet.getFormattedTimestamp(tweet.createdAt);
 
+        if(urls.length()>0)
+        {
+            JSONObject links = urls.getJSONObject(0);
+            tweet.media = links.getString("url");
+            tweet.mediaCount = 1;
+            Log.i("MediaCounter","found");
+        }
+
+        tweet.time = tweet.getFormattedTimestamp(tweet.createdAt);
         return tweet;
     }
 
