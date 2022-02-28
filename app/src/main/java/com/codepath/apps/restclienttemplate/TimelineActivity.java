@@ -1,5 +1,7 @@
 package com.codepath.apps.restclienttemplate;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -7,11 +9,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.codepath.apps.restclienttemplate.models.ComposeActivity;
 import com.codepath.apps.restclienttemplate.models.Tweet;
+import com.codepath.apps.restclienttemplate.models.TweetDao;
+import com.codepath.apps.restclienttemplate.models.TweetWithUser;
+import com.codepath.apps.restclienttemplate.models.User;
 import com.codepath.asynchttpclient.callback.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -25,10 +35,48 @@ import okhttp3.Headers;
 
 public class TimelineActivity extends AppCompatActivity {
 
+    public static final String TAG = "TimelineActivity";
+    private final int REQUEST_CODE = 20;
+
     TwitterClient client;
     RecyclerView rvTweets;
     List<Tweet> tweets;
     TweetAdapter adapter;
+    TweetDao tweetDao;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.compose)
+        {
+            Toast.makeText(this, "L", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ComposeActivity.class);
+            startActivityForResult(intent, REQUEST_CODE);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
+        if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            //Get data from intent(tweet)
+            Tweet tweet = Parcels.unwrap(data.getParcelableExtra("tweet"));
+            //Pass relevant data back
+            // Modify data source of tweets
+            tweets.add(0,tweet);
+            // Update the adapter
+            adapter.notifyItemInserted(0);
+            rvTweets.smoothScrollToPosition(0);
+        }
+        super.onActivityResult(requestCode,resultCode, data);
+    }
+
     SwipeRefreshLayout swipeContainer;
     EndlessRecyclerViewScrollListener scrollListener;
 
@@ -38,6 +86,7 @@ public class TimelineActivity extends AppCompatActivity {
         setContentView(R.layout.activity_timeline);
 
         client = TwitterApp.getRestClient(this);
+        tweetDao = ((TwitterApp) getApplicationContext()).getMyDatabase().tweetDao();
 
         swipeContainer = findViewById(R.id.swipeContainer);
         /*
@@ -74,6 +123,25 @@ public class TimelineActivity extends AppCompatActivity {
         //adds scroll Listener to RecyclerView
         rvTweets.addOnScrollListener(scrollListener);
 
+        //existing tweets in DB
+        AsyncTask.execute(new Runnable(){
+            @Override
+            public void run() {
+                Log.i(TAG, "showing database");
+                List<TweetWithUser>  tweetWithUsers = tweetDao.recentItems();
+                List<Tweet> tweetsFromDB = TweetWithUser.getTweetList(tweetWithUsers);
+                adapter.clear();
+                adapter.addAll(tweetsFromDB);
+            }
+        });
+
+        //query for existing tweets in DB
+        AsyncTask.execute((new Runnable() {
+            @Override
+            public void run() {
+                tweetDao.recentItems();
+            }
+        }));
         populateHomeTimeline();
     }
 
@@ -110,9 +178,23 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.i("populating", "onSuccess" + json.toString());
                 JSONArray jsonArray = json.jsonArray;
                 try {
+                    List<Tweet> tweetFromNetwork = Tweet.fromJsonArray(jsonArray);
                     adapter.clear();
-                    adapter.addAll(Tweet.fromJsonArray(jsonArray));
+                    adapter.addAll(tweetFromNetwork);
                     swipeContainer.setRefreshing(false);
+                    //existing tweets in DB
+                    AsyncTask.execute(new Runnable(){
+                        @Override
+                        public void run() {
+                            Log.i(TAG, "saving data to database");
+                            //insert users
+                            List<User> usersFromNetwork = User.fromJsonTweetArray(tweetFromNetwork);
+                            tweetDao.insertModel(usersFromNetwork.toArray(new User[0]));
+                            //Insert tweets
+                            tweetDao.insertModel(tweetFromNetwork.toArray((new Tweet[0])));
+                        }
+                    });
+
                 } catch (JSONException e) {
                     Log.e("populating", "Json Exception", e);
                 }
