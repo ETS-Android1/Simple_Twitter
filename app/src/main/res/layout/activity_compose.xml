@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".models.ComposeActivity">
+    tools:context=".models.ComposeActivity"
+    app:counterEnabled="true"
+    app:counterMaxLength="140">
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/etCompose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,6 +19,7 @@
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"
+        android:maxLength="140"
         android:minLines="5" />
 
     <Button
@@ -29,4 +32,5 @@
         android:layout_marginEnd="30dp"
         android:text="@string/Tweet"
         tools:text="@string/Tweet" />
-</RelativeLayout>
+
+</com.google.android.material.textfield.TextInputLayout>
